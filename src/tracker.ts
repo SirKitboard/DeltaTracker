@@ -47,7 +47,7 @@ interface FormattedPlayerMMRHistory {
 	[Playlists.RANKED_THREES]: FormattedMMRHistoryEntry
 }
 
-export default class BallChasing {
+export default class Tracker {
 	static playerProfileResponseMap: {[key: string]: PlayerProfileResponse} = {}
 	static playerMMRHistoryResponseMap: {[key: string]: FormattedPlayerMMRHistory} = {}
 	private static browser: puppeteer.Browser;

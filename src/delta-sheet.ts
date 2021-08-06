@@ -3,7 +3,7 @@ import * as readline from 'readline';
 import { google } from 'googleapis';
 import { OutputRow } from './main';
 
-const SHEET_ID = '1m1R0Ytd4GZ0u0jjz5DTFFf0Vw77ZPKE6QXQPupAXGxY';
+const SHEET_ID = '1X1plwY6DFFCCK-iY-FGNxiU0oVMlaFQkqegLzRJpY0g';
 const TOKEN_PATH = 'token.json';
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
@@ -104,7 +104,7 @@ export default class DeltaSheet {
 	}
 
 	async getPlayers() {
-		const rows = await this.getSheetData("Tracker Import v2!B3:O");
+		const rows = await this.getSheetData("Tracker Import!B3:W");
 		const players: Player[] = rows.filter((row) => {
 			return row[1] != undefined;
 		}).map((row) => {
@@ -135,15 +135,15 @@ export default class DeltaSheet {
 
 	private async populateLastTrackedData() {
 		this.trackingData = {};
-		const data = await this.getSheetData("Daily Tracking V3!C3:F");
+		const data = await this.getSheetData("Daily Tracking!C3:E");
 		for(const row of data) {
 			if(row[1] in this.trackingData) {
-				const date = new Date(row[3]);
+				const date = new Date(row[2]);
 				if(date > this.trackingData[row[0]]) {
 					this.trackingData[row[0]] = date;
 				}
 			} else {
-				this.trackingData[row[0]] = new Date(row[3]);
+				this.trackingData[row[0]] = new Date(row[2]);
 			}
 		}
 	}
@@ -158,7 +158,6 @@ export default class DeltaSheet {
 			formattedRows.push([
 				row.accountID,
 				row.playerID,
-				row.playerName,
 				row.dateTime,
 				row.twosMMR,
 				row.twosGamesPlayed,
@@ -167,8 +166,8 @@ export default class DeltaSheet {
 			])
 		}
 
-		const insertRow = (await this.getSheetData("Daily Tracking V3!C1:C")).length + 1;
-		const insertRange = `Daily Tracking V3!C${insertRow}:L`;
+		const insertRow = (await this.getSheetData("Daily Tracking!C1:C")).length + 1;
+		const insertRange = `Daily Tracking!C${insertRow}:I`;
 
 		await this.sheet.spreadsheets.values.update({
 			spreadsheetId: SHEET_ID,

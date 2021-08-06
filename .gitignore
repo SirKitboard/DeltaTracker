@@ -27,3 +27,9 @@ build/
 
 # Misc
 .DS_Store
+
+.env
+credentials.json
+*.matlab
+client_secret*
+token.json
