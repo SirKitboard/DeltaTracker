@@ -1,9 +1,8 @@
-// import puppeteer from 'puppeteer';
-// import * as readline from 'readline';
 import * as dotenv from 'dotenv';
 import DeltaSheet from './delta-sheet';
 import Tracker, { Playlists } from './tracker';
 import * as cliProgress from 'cli-progress';
+import { exit } from 'process';
 
 dotenv.config();
 
@@ -89,4 +88,5 @@ export interface OutputRow {
 	};
 
 	pb?.stop();
+	exit();
 })();
