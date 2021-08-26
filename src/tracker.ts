@@ -124,7 +124,7 @@ export default class Tracker {
 	}
 
 	private static getDateString(on: Date) {
-		return `${on.getFullYear()}-${(on.getMonth() + 1).toString().padStart(2, '0')}-${on.getDate()}T00:00:00+00:00`
+		return `${on.getFullYear()}-${(on.getMonth() + 1).toString().padStart(2, '0')}-${on.getDate().toString().padStart(2, '0')}T00:00:00+00:00`
 	}
 
 	public static async getPlayerMMR(platformID: string, platform: string, playlist: Playlists, on: Date): Promise<number> {

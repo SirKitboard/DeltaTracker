@@ -1,7 +1,6 @@
 import * as dotenv from 'dotenv';
 import DeltaSheet from './delta-sheet';
 import Tracker, { Playlists } from './tracker';
-import * as cliProgress from 'cli-progress';
 import { exit } from 'process';
 
 dotenv.config();
@@ -19,7 +18,7 @@ export interface OutputRow {
 	threesGamesPlayed: number;
 }
 
-(async () => {
+async function sync() {
 	const deltaSheet = new DeltaSheet();
 	await deltaSheet.init();
 	let players = await deltaSheet.getPlayers();
@@ -30,14 +29,12 @@ export interface OutputRow {
 
 	// pullDate.setDate(pullDate.getDate() + 1);
 	const today = new Date();
-	
+	today.setHours(0, 0, 0, 0);
+	let totalRows = 0;
+	const errorPlayers = [];
 	let outputRows: OutputRow[] = [];
-	let pb: cliProgress.SingleBar | null = null;
-	pb = new cliProgress.SingleBar({}, cliProgress.Presets.legacy);
-	pb.start(players.length, 0, {
-		speed: "N/A"
-	});
 	for(let [i, player] of players.entries()) {
+		console.log(`Stating Sync for: ${player.deltaID} ${i+1}/${players.length}`)
 		let rowTemplate: Partial<OutputRow> = {
 			playerID: player.deltaID,
 			playerName: player.name,
@@ -50,12 +47,16 @@ export interface OutputRow {
 		let rows: OutputRow[] = [];
 
 		for(let account of player.accounts) {
+			if(account.accountID === 'Loading...') {
+				throw new Error('Error loading sheet');
+			};
 			try {
 				let on = await deltaSheet.getLastPullDateForLinkID(account.accountID);
 				if(!on) {
 					on = new Date(ROCKET_LEAGUE_LAUNCH_DATE);
 				}
 				while(on < today) {
+					console.log(`\t\tFetching data for ${on.toLocaleDateString()}`)
 					on.setDate(on.getDate() + 1);
 					const twosMMR = await Tracker.getPlayerMMR(account.platformID, account.platform, Playlists.RANKED_TWOS, on);
 					const twosGamesPlayed = await Tracker.getPlayerNumGamesPlayed(account.platformID, account.platform, Playlists.RANKED_TWOS);
@@ -76,17 +77,36 @@ export interface OutputRow {
 				}
 			} catch(e) {
 				// Player error, skipping
+				console.log(`Errored Account ID: ${account.accountID}`)
+				errorPlayers.push(account.accountID)
 			}
 		}
 		outputRows.push(...rows);
-		pb?.increment();
 
 		if(i % 20 === 0) {
 			await deltaSheet.insertHistoryRows(outputRows);
+			console.log("Wrote rows:", outputRows.length)
+			totalRows+=outputRows.length;
 			outputRows = [];
 		}
 	};
-
-	pb?.stop();
+	await deltaSheet.insertHistoryRows(outputRows);
+	totalRows+=outputRows.length;
+	console.log("Total rows", totalRows)
+	console.log("Errors", errorPlayers)
 	exit();
+}
+
+(async () => {
+
+	let success = false;
+
+	do {
+		try {
+			await sync();
+			success = true;
+		} catch(e) {
+			console.log(e)
+		}
+	} while(!success)
 })();

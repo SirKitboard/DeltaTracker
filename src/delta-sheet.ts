@@ -106,7 +106,7 @@ export default class DeltaSheet {
 	async getPlayers() {
 		const rows = await this.getSheetData("Tracker Import!B3:W");
 		const players: Player[] = rows.filter((row) => {
-			return row[1] != undefined;
+			return row[1] != undefined && row[1].length > 0;
 		}).map((row) => {
 			const player: Player = {
 				deltaID: row[0],
@@ -138,6 +138,7 @@ export default class DeltaSheet {
 		const data = await this.getSheetData("Daily Tracking!C3:E");
 		for(const row of data) {
 			if(row[1] in this.trackingData) {
+				console.log(row);
 				const date = new Date(row[2]);
 				if(date > this.trackingData[row[0]]) {
 					this.trackingData[row[0]] = date;
