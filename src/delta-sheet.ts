@@ -77,7 +77,7 @@ export default class DeltaSheet {
 			});
 		})
 
-		let oAuth2Client = await loginPromise;
+		const oAuth2Client = await loginPromise;
 		const sheets = google.sheets({
 			version: 'v4',
 			auth: oAuth2Client as any
@@ -155,7 +155,7 @@ export default class DeltaSheet {
 
 	async insertHistoryRows(rows: OutputRow[]) {
 		const formattedRows = [];
-		for(let row of rows) {
+		for(const row of rows) {
 			formattedRows.push([
 				row.accountID,
 				row.playerID,

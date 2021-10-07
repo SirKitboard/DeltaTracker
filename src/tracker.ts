@@ -1,5 +1,5 @@
 import * as puppeteer from "puppeteer"
-const axios = require('axios');
+import axios from 'axios'
 
 interface PlayerProfileSegmnet {
 	type: string,
@@ -91,7 +91,7 @@ export default class Tracker {
 	}
 
 	private static async getPlayerProfileID(platformID: string, platform: string): Promise<number> {
-		let player = await this.getPlayerProfile(platformID, platform);
+		const player = await this.getPlayerProfile(platformID, platform);
 		const playerID = player.data.metadata.playerId;
 		return playerID;
 	}
@@ -101,8 +101,8 @@ export default class Tracker {
 			return this.playerMMRHistoryResponseMap[`${platformID}${platform}`];
 		}
 
-		let playerID = await this.getPlayerProfileID(platformID, platform); 
-		let url = `https://api.tracker.gg/api/v1/rocket-league/player-history/mmr/${playerID}`;
+		const playerID = await this.getPlayerProfileID(platformID, platform); 
+		const url = `https://api.tracker.gg/api/v1/rocket-league/player-history/mmr/${playerID}`;
 		let playerMMRHistory: PlayerMMRHistoryResponse;
 		try {
 			playerMMRHistory = await this.fetchAxios(url) as PlayerMMRHistoryResponse;
@@ -114,8 +114,8 @@ export default class Tracker {
 			[Playlists.RANKED_THREES]: {},
 		}
 		const playlists = [Playlists.RANKED_TWOS, Playlists.RANKED_THREES];
-		for(let playlist of playlists) {
-			for(let sample of playerMMRHistory.data[playlist]) {
+		for(const playlist of playlists) {
+			for(const sample of playerMMRHistory.data[playlist]) {
 				formattedPlayerMMRHistory[playlist][sample.collectDate] = sample.rating;
 			}
 		}
@@ -130,7 +130,7 @@ export default class Tracker {
 	public static async getPlayerMMR(platformID: string, platform: string, playlist: Playlists, on: Date): Promise<number> {
 		const history = await this.getPlayerMMRHistory(platformID, platform)
 		on.setHours(0, 0, 0);
-		let dateString = this.getDateString(on);
+		const dateString = this.getDateString(on);
 		if(history[playlist][dateString]) {
 			return history[playlist][dateString];
 		} 
@@ -138,9 +138,9 @@ export default class Tracker {
 	}
 
 	public static async getPlayerNumGamesPlayed(platformID: string, platform: string, playlist: Playlists): Promise<number> {
-		let player = await this.getPlayerProfile(platformID, platform);
+		const player = await this.getPlayerProfile(platformID, platform);
 
-		for (let segment of player.data.segments) {
+		for (const segment of player.data.segments) {
 			if(segment.type === 'playlist' && segment.attributes.playlistId as any == playlist) {
 				return segment.stats.matchesPlayed.value;
 			}

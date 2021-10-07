@@ -21,7 +21,7 @@ export interface OutputRow {
 async function sync() {
 	const deltaSheet = new DeltaSheet();
 	await deltaSheet.init();
-	let players = await deltaSheet.getPlayers();
+	const players = await deltaSheet.getPlayers();
 	console.info("Number of players: ", players.length);
 
 	// const pullDate = await deltaSheet.getLastPullDate();
@@ -33,9 +33,9 @@ async function sync() {
 	let totalRows = 0;
 	const errorPlayers = [];
 	let outputRows: OutputRow[] = [];
-	for(let [i, player] of players.entries()) {
+	for(const [i, player] of players.entries()) {
 		console.log(`Stating Sync for: ${player.deltaID} ${i+1}/${players.length}`)
-		let rowTemplate: Partial<OutputRow> = {
+		const rowTemplate: Partial<OutputRow> = {
 			playerID: player.deltaID,
 			playerName: player.name,
 			twosMMR: 0,
@@ -44,9 +44,9 @@ async function sync() {
 			threesGamesPlayed: 0
 		};
 
-		let rows: OutputRow[] = [];
+		const rows: OutputRow[] = [];
 
-		for(let account of player.accounts) {
+		for(const account of player.accounts) {
 			if(account.accountID === 'Loading...') {
 				throw new Error('Error loading sheet');
 			};
