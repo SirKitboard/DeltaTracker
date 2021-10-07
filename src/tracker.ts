@@ -53,7 +53,7 @@ export default class Tracker {
 	private static browser: puppeteer.Browser;
 
 	private static async initBrowser() {
-		this.browser = await puppeteer.launch();
+		this.browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
 	}
 
 	private static async fetchPuppeteer(url: string): Promise<PlayerProfileResponse | PlayerMMRHistoryResponse> {
