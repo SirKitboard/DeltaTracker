@@ -3,7 +3,6 @@ import * as readline from 'readline';
 import { google } from 'googleapis';
 import { OutputRow } from './main';
 
-const SHEET_ID = '1X1plwY6DFFCCK-iY-FGNxiU0oVMlaFQkqegLzRJpY0g';
 const TOKEN_PATH = 'token.json';
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
@@ -22,6 +21,12 @@ interface Player {
 export default class DeltaSheet {
 	private sheet: any;
 	private trackingData: {[key: string]: Date | null};
+	private SHEET_ID: string;
+
+	constructor() {
+
+		this.SHEET_ID = process.env.SHEET_ID;
+	}
 
 	public async init() {
 		this.sheet = await this.getSheetsAPI();
@@ -89,7 +94,7 @@ export default class DeltaSheet {
 	async getSheetData(range) {
 		return new Promise<any>((resolve, reject) => {
 			this.sheet.spreadsheets.values.get({
-				spreadsheetId: SHEET_ID,
+				spreadsheetId: this.SHEET_ID,
 				range: range,
 			}, (err, res) => {
 				if (err) return reject('The API returned an error: ' + err);
@@ -171,7 +176,7 @@ export default class DeltaSheet {
 		const insertRange = `Daily Tracking!C${insertRow}:I`;
 
 		await this.sheet.spreadsheets.values.update({
-			spreadsheetId: SHEET_ID,
+			spreadsheetId: this.SHEET_ID,
 			range: insertRange,
 			valueInputOption: "USER_ENTERED",
 			resource: {
